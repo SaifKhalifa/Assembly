@@ -1,11 +1,12 @@
 ;=====================================================================
 ;=============== Assembly course 1st semester - 2022 =================
 ;===============     An-najah national university    =================
-;===============        Instructor : Ahmad Awad.     =================
+;===============    Instructor : Ahmad Awwad. Ph,D   =================
 ;=====================================================================
-; This project was written in dirty hands and slippery fingers by:
+; This code was written in dirty hands and slippery fingers by:
 ;       1.Saif Khalifa.
 ;       2.Ameer Al-Sousa.
+;       3.Mousab Sawafta.
 ;=====================================================================
 ;=====================================================================
 
