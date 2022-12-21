@@ -20,15 +20,10 @@ print_S MACRO MSG ;A macro to print string.
 ENDM 
 
 print_s_center MACRO MSG ;A macro to print string in the center of the console.     
-    MOV AX,50H
-    MOV BH,71H
-    MOV CX,0000H ;UPPER LEFT ROW,COLUMN
-    MOV DX,0184H ;LOWER RIGHT ROW,COLUMN
-    INT 10H
     MOV AH,02H
-    MOV BH,00H
-    MOV DH,0CH
-    MOV DL,23H
+    MOV BH,00H;page NO.
+    MOV DH,0CH;ROW
+    MOV DL,23H;COL
     INT 10H
     
     MOV AH,09h
@@ -43,8 +38,13 @@ get_s MACRO STR ;A macro to take string input from the console.
 ENDM   
 
 CLS MACRO ;A macro to clear console screen. 
-    MOV AH,00H
-    MOV AH,03H
+    ;MOV AH,00H
+    ;MOV AH,03H
+    ;INT 10H
+    MOV AX,0600H
+    MOV BH,07H
+    MOV CX,0000H
+    MOV DX,184FH
     INT 10H
 ENDM
 
@@ -56,7 +56,16 @@ ENDM
 ;******************** END MACROS ******************** 
 
 .DATA
-    str1 db "1 + 1 = 2$"
+    parList LABEL BYTE
+    max DB 100 ;Maximum number of characters in the string.
+    actLen db ?;Actual length of the string.
+    str db 100 DUP('$') ;string (Array of characters).
+    ;********************************************************
+    
+    prompt DB "Please enter the paragraph to extract the arithmetic expression from : $"
+    
+    error1 DB "The maximum number of characters is 100, Please enter a valid paragraph or type 'exit' to stop the program !",13,10,"$" 
+    error2 DB "There are no numbers or arithmetic operation in the text you've entered !",13,10,"$"
 
 .CODE
 START:
@@ -67,8 +76,11 @@ START:
     ;MOV AH,09h ;display the string until $.
     ;INT 21h 
     
-    print_s_center str1
+    ;print_s_center str1
     
+    CLS
+    
+    ;print_s_center str2
     ;print_s str1
     
     .EXIT ;Return control to the OS.    
