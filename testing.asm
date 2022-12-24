@@ -217,11 +217,11 @@ PROC strPrc NEAR
     divide_result:
     
     arrow_loop:
-        MOV AH, 0x00
-        INT 0x16
-        CMP AL, 0x25
+        MOV AH, 0h
+        INT 16h
+        CMP AL, 25h
         JE move_left
-        CMP AL, 0x26
+        CMP AL, 26h
         JE move_up
-        CMP AL, 0x                    
+        CMP AL, 0h                    
 ENDP
