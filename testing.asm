@@ -107,11 +107,35 @@ PROC strPrc NEAR
         CMP BYTE PTR[SI],00h ;00 : ASCII code for 'null', if null found that means the string is ended.
         JE strEnd    
         
-        CMP BYTE PTR[SI],'0';if it was less than 0 and greater than 9 it will not be considered.
-        JB not_a_number
+        CMP BYTE PTR[SI],'0'
+        JNE not_a_number
         
-        CMP BYTE PTR [SI],'9'
-        JA not_a_number
+        CMP BYTE PTR[SI],'1'
+        JNE not_a_number
+
+        CMP BYTE PTR[SI],'2'
+        JNE not_a_number
+
+        CMP BYTE PTR[SI],'3'
+        JNE not_a_number
+
+        CMP BYTE PTR[SI],'4'
+        JNE not_a_number
+
+        CMP BYTE PTR[SI],'5'
+        JNE not_a_number
+
+        CMP BYTE PTR[SI],'6'
+        JNE not_a_number
+
+        CMP BYTE PTR[SI],'7'
+        JNE not_a_number
+
+        CMP BYTE PTR [SI],'8'
+        JNE not_a_number
+
+        CMP BYTE PTR[SI],'9'
+        JNE not_a_number
         
         SUB BYTE PTR[SI],'0'
         ADD numeric_value,AX
