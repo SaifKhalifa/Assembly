@@ -74,12 +74,12 @@ ENDM
     
     prompt DB "Please enter the paragraph to extract the arithmetic expression from :",13,10,"$"
     
-    error1 DB "The maximum number of characters is 100, Please enter a valid paragraph or type 'exit' to stop the program !",13,10,"$" 
-    error2 DB "There are no numbers or arithmetic operation in the text you've entered !",13,10,"$"
+    error1 DB "There are no numbers or arithmetic operation in the text you've entered !",13,10,"$"
     
     numeric_value DB ?
     operation DB ? ;1:addition / 2:subtraction / 3:multiplication / 4:division.
-    result DB "$"
+    result DB ?
+    buffer DB 50 DUP(0) ;To store the result as string, actualy we can store it directly in the result variable above but we could lose the original value in it.
 .CODE
 START:
     MOV AX,@data
@@ -196,7 +196,7 @@ PROC strPrc NEAR
         ;JA operator_error
 
     strEnd:
-        cmp operation, 1
+        CMP operation, 1
         JE add_result
         
         CMP operation, 2
@@ -209,19 +209,80 @@ PROC strPrc NEAR
         JE divide_result
         
     add_result:
+        MOV AX,numeric_value
+        ADD CX,AX
+        MOV result,CX        
     
     subtract_result:
-    
+        MOV AX,numeric_value
+        SUB CX,AX
+        MOV result,CX
+            
     multiply_result:
-    
+        MOV AX,numeric_value
+        MUL CX
+        MOV result,AX
+        
     divide_result:
-    
+        MOV AX,numeric_value
+        DIV CX
+        MOV result,AX
+            
     arrow_loop:
-        MOV AH, 0h
-        INT 16h
-        CMP AL, 25h
-        JE move_left
-        CMP AL, 26h
+        ;MOV AH, 0h
+;        INT 16h
+;        CMP AL, 25h
+;        JE move_left
+;        CMP AL, 26h
+;        JE move_up
+;        CMP AL, 0h
+        
+        ; Check for up arrow key input
+        CMP AH, 48h
         JE move_up
-        CMP AL, 0h                    
+
+        ; Check for down arrow key input
+        CMP AH, 50h
+        JE move_down
+
+        ; Check for left arrow key input
+        CMP AH, 4Bh
+        JE move_left
+
+        ; Check for right arrow key input
+        CMP AH, 4Dh
+        JE move_right
+
+        ; If none of the above, return to the beginning of the loop
+        JMP arrow_loop
+    move_up:
+        ; Move the text cursor up by one row
+        MOV AH, 02h
+        MOV BH, 00h ; Page number
+        MOV DH, -1 ; Number of rows to move up
+        MOV DL, 00h ; Column position (not changed)
+        INT 10h
+        
+        ; Convert the result value to a string
+        MOV SI, 0
+        MOV AX, result
+        div_loop:
+            CMP AX, 0
+            JE done
+            
+            MOV buffer[SI], AH
+            INC SI
+            MOV BX, 10
+            DIV BX
+            JMP div_loop
+            
+            done:
+                MOV buffer[SI], 0
+
+                ; Load the address of the buffer into the dx register
+                LEA DX, buffer
+
+                ; Print the string
+                MOV AH, 09h
+                INT 21h                    
 ENDP
