@@ -66,7 +66,9 @@ ENDM
 ;******************** END MACROS & PROCEDURES ******************** 
 
 .DATA
-    actLen DB ?;Actual length of the string.
+    
+    actLen DW ?;Actual length of the string.
+
     TXT DB 101 DUP('$') ;string (Array of characters).
     ;********************************************************
     
@@ -78,6 +80,7 @@ ENDM
     operation DB 0 ;1:addition / 2:subtraction / 3:multiplication / 4:division.
     result DW ?
     buffer DB 50 DUP(0) ;To store the result as string, actualy we can store it directly in the result variable above but we could lose the original value in it.
+    txtBuffer DB 10 dup("$")
 .CODE
 START:
     MOV AX,@data
@@ -85,7 +88,7 @@ START:
     
     print prompt
     
-    get_s_list parList
+    get_s TXT
     
     endl
     
@@ -97,7 +100,7 @@ START:
 
 
 PROC strPrc ;NEAR
-    LEA SI,str
+    LEA SI,TXT
     MOV numeric_value,0
     MOV operation,0
     
@@ -108,59 +111,59 @@ PROC strPrc ;NEAR
         CMP BYTE PTR[SI],'0'
         JNE not_a_number
         
-        LEA DI,str
-        LEA CX,actLen
-        MOV AL,'z'
-        CLD 
-        REPE CMPSB
-        JZ zero_found
-        ;CMP BYTE PTR[SI],'zero'
-        JMP not_a_number
+        ;LEA DI,TXT
+        ;LEA CX,actLen
+        ;MOV AL,'z'
+        ;CLD 
+        ;REPE CMPSB
+        ;JZ zero_found
+        ;CMP BYTE PTR[SI],"zero"
+        ;JMP not_a_number
         
         CMP BYTE PTR[SI],'1'
         JNE not_a_number
-        CMP BYTE PTR[SI],'one'
-        JNE not_a_number
+        ;CMP BYTE PTR[SI],'one'
+;        JNE not_a_number
 
         CMP BYTE PTR[SI],'2'
         JNE not_a_number
-        CMP BYTE PTR[SI],'two'
-        JNE not_a_number
+        ;CMP BYTE PTR[SI],'two'
+;        JNE not_a_number
 
         CMP BYTE PTR[SI],'3'
         JNE not_a_number
-        CMP WORD PTR[SI],'three'
-        JNE not_a_number
+        ;CMP WORD PTR[SI],'three'
+;        JNE not_a_number
 
         CMP BYTE PTR[SI],'4'
         JNE not_a_number
-        CMP WORD PTR[SI],'four'
-        JNE not_a_number
+        ;CMP WORD PTR[SI],'four'
+;        JNE not_a_number
 
         CMP BYTE PTR[SI],'5'
         JNE not_a_number
-        CMP WORD PTR[SI],'five'
-        JNE not_a_number
-
+        ;CMP WORD PTR[SI],'five'
+;        JNE not_a_number
+;
         CMP BYTE PTR[SI],'6'
         JNE not_a_number
-        CMP WORD PTR[SI],'six'
-        JNE not_a_number
+       ; CMP WORD PTR[SI],'six'
+;        JNE not_a_number
 
         CMP BYTE PTR[SI],'7'
         JNE not_a_number
-        CMP WORD PTR[SI],'seven'
-        JNE not_a_number
+        ;CMP WORD PTR[SI],'seven'
+;        JNE not_a_number
 
         CMP BYTE PTR [SI],'8'
         JNE not_a_number
-        CMP WORD PTR[SI],'eight'
-        JNE not_a_number
+        ;CMP WORD PTR[SI],'eight'
+;        JNE not_a_number
 
         CMP BYTE PTR[SI],'9'
         JNE not_a_number
-        CMP WORD PTR[SI],'nine'
-        JNE not_a_number
+        ;CMP WORD PTR[SI],'nine'
+;        JNE not_a_number
         
         SUB BYTE PTR[SI],'0'
         ADD numeric_value,AX
@@ -170,72 +173,58 @@ PROC strPrc ;NEAR
         
     not_a_number:
         ;addition
-        CMP WORD PTR[SI],'add'
-        JE do_add
-        
-        CMP WORD PTR[SI],'addition'
-        JE do_add
-        
-        CMP WORD PTR[SI],'+'
-        JE do_add
-        
-        ;multiplication
-        CMP WORD PTR[SI],'multiply'    
-        JE do_mul
-        
-        CMP WORD PTR[SI],'multiplication'    
-        JE do_mul
-        
-        CMP WORD PTR[SI],'mul'    
-        JE do_mul
-        
-        CMP WORD PTR[SI],'*'    
-        JE do_mul
-        
-        ;division
-        CMP WORD PTR[SI],'div'
-        JE do_div
-        
-        CMP WORD PTR[SI],'divide'
-        JE do_div
-        
-        CMP WORD PTR[SI],'division'
-        JE do_div
-        
-        CMP WORD PTR[SI],'/'
-        JE do_div
-        
-        ;subtraction
-        CMP WORD PTR[SI],'sub'
-        JE do_sub
-        
-        CMP WORD PTR[SI],'subtract'
-        JE do_sub
-        
-        CMP WORD PTR[SI],'subtraction'
-        JE do_sub
-        
-        CMP WORD PTR[SI],'-'
-        JE do_sub
-        
-        INC SI
-        JMP loop_start
-    
+        CMP WORD PTR[SI],'a'
+        JE store_add
+;        
+;        
+;        ;multiplication
+;        ;CMP WORD PTR[SI],'multiply'    
+;        ;JE do_mul
+;        
+;        ;division
+;        ;CMP WORD PTR[SI],'divide'
+;        ;JE do_div
+;        
+;        INC SI
+;        JMP loop_start
+    store_add:
+        MOV txtBuffer[0],'a'
+        MOV txtBuffer[1],'d'
+        MOV txtBuffer[2],'d'
+
+        LEA DI,txtBuffer
+
+        CALL findLen
+        LEA CX,actLen2
+        MOV AL,'a'
+        CLD 
+        REPE CMPSB
+        JMP do_add
+    store_mul:
+        MOV txtBuffer[0],'a'
+        MOV txtBuffer[1],'d'
+        MOV txtBuffer[2],'d'
+
+        LEA DI,txtBuffer
+
+        CALL findLen
+        LEA CX,actLen2
+        MOV AL,'a'
+        CLD 
+        REPE CMPSB
+        JZ do_add
+        JMP do_add
     do_add:
         MOV operation,1
         INC SI
         JMP loop_start
-        
-    do_sub:
+
+    do_mul:
         MOV operation,2
         INC SI 
         JMP loop_start
-    do_mul:
-        MOV operation,3
-        INC SI 
-        JMP loop_start
     do_div:
-        MOV operation,4
+        MOV operation,3
         INC SI 
         JMP loop_start         
         ;CMP BYTE PTR [SI], '0'
@@ -249,12 +238,9 @@ PROC strPrc ;NEAR
         JE add_result
         
         CMP operation, 2
-        JE subtract_result
-        
-        CMP operation, 3
         JE multiply_result
         
-        CMP operation, 4
+        CMP operation, 3
         JE divide_result
         
     add_result:
@@ -335,21 +321,57 @@ PROC strPrc ;NEAR
                 MOV AH, 09h
                 INT 21h
                 
-                RET
+                RET 
+                move_down:
+                move_left:
+                move_right:
     zero_found:                    
 ENDP
 
 findLen PROC
-    LEA SI,TXT
+    LEA SI,txtBuffer
     MOV CX,0
 
     next_ch:
         MOV AL,[SI]
         INC CX
+        
+        INC AL  
         CMP AL,0
         JNE next_ch
 
-        MOV actLen,CX
+        MOV actLen2,CX
         RET
 ENDP
+
+;txtProcess PROC 
+;    LEA SI,TXT
+;    LEA DI,"zero"
+;    next:
+;        MOV AL,[SI]
+;        MOV DL,[DI]
+;        
+;        CMP AL,DL        
+;        JNE not_match
+;        
+;        INC SI
+;        INC DI
+;        
+;        CMP DL,0 ;check if end of the given word is ended.
+;        JE number_found
+;        
+;        JMP next
+;        
+;    not_match:
+;        INC SI
+;        LEA DI,"zero"
+;        
+;        CMP AL,0
+;        JNE next
+;        JE endStr
+;    number_found:
+;    
+;    endStr:
+;               
+;ENDP
 END START
