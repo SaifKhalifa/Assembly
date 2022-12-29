@@ -31,8 +31,8 @@ print_center MACRO MSG ;A macro to print string in the center of the console.
     INT 21H    
 ENDM
 
-get_s_list MACRO STR ;A macro to take string input from the console.
-    LEA DX,STR
+get_s MACRO txt ;A macro to take string input from the console.
+    LEA DX,txt
     MOV AH,0AH
     INT 21H
 ENDM   
@@ -66,19 +66,17 @@ ENDM
 ;******************** END MACROS & PROCEDURES ******************** 
 
 .DATA
-    parList LABEL BYTE
-    max DB 101 ;Maximum number of characters in the string, 100 charcter and 1 for the enter.
     actLen DB ?;Actual length of the string.
-    str DB 101 DUP('$') ;string (Array of characters).
+    TXT DB 101 DUP('$') ;string (Array of characters).
     ;********************************************************
     
     prompt DB "Please enter the paragraph to extract the arithmetic expression from :",13,10,"$"
     
     error1 DB "There are no numbers or arithmetic operation in the text you've entered !",13,10,"$"
     
-    numeric_value DB ?
-    operation DB ? ;1:addition / 2:subtraction / 3:multiplication / 4:division.
-    result DB ?
+    numeric_value DW ?
+    operation DB 0 ;1:addition / 2:subtraction / 3:multiplication / 4:division.
+    result DW ?
     buffer DB 50 DUP(0) ;To store the result as string, actualy we can store it directly in the result variable above but we could lose the original value in it.
 .CODE
 START:
@@ -91,14 +89,14 @@ START:
     
     endl
     
-    
+    CALL strPrc
     
     ;CLS
     
     .EXIT ;Return control to the OS.    
-END START
 
-PROC strPrc NEAR
+
+PROC strPrc ;NEAR
     LEA SI,str
     MOV numeric_value,0
     MOV operation,0
@@ -110,31 +108,58 @@ PROC strPrc NEAR
         CMP BYTE PTR[SI],'0'
         JNE not_a_number
         
+        LEA DI,str
+        LEA CX,actLen
+        MOV AL,'z'
+        CLD 
+        REPE CMPSB
+        JZ zero_found
+        ;CMP BYTE PTR[SI],'zero'
+        JMP not_a_number
+        
         CMP BYTE PTR[SI],'1'
+        JNE not_a_number
+        CMP BYTE PTR[SI],'one'
         JNE not_a_number
 
         CMP BYTE PTR[SI],'2'
         JNE not_a_number
+        CMP BYTE PTR[SI],'two'
+        JNE not_a_number
 
         CMP BYTE PTR[SI],'3'
+        JNE not_a_number
+        CMP WORD PTR[SI],'three'
         JNE not_a_number
 
         CMP BYTE PTR[SI],'4'
         JNE not_a_number
+        CMP WORD PTR[SI],'four'
+        JNE not_a_number
 
         CMP BYTE PTR[SI],'5'
+        JNE not_a_number
+        CMP WORD PTR[SI],'five'
         JNE not_a_number
 
         CMP BYTE PTR[SI],'6'
         JNE not_a_number
+        CMP WORD PTR[SI],'six'
+        JNE not_a_number
 
         CMP BYTE PTR[SI],'7'
+        JNE not_a_number
+        CMP WORD PTR[SI],'seven'
         JNE not_a_number
 
         CMP BYTE PTR [SI],'8'
         JNE not_a_number
+        CMP WORD PTR[SI],'eight'
+        JNE not_a_number
 
         CMP BYTE PTR[SI],'9'
+        JNE not_a_number
+        CMP WORD PTR[SI],'nine'
         JNE not_a_number
         
         SUB BYTE PTR[SI],'0'
@@ -197,7 +222,7 @@ PROC strPrc NEAR
         JMP loop_start
     
     do_add:
-        MOV operaiton,1
+        MOV operation,1
         INC SI
         JMP loop_start
         
@@ -308,5 +333,23 @@ PROC strPrc NEAR
 
                 ; Print the string
                 MOV AH, 09h
-                INT 21h                    
+                INT 21h
+                
+                RET
+    zero_found:                    
 ENDP
+
+findLen PROC
+    LEA SI,TXT
+    MOV CX,0
+
+    next_ch:
+        MOV AL,[SI]
+        INC CX
+        CMP AL,0
+        JNE next_ch
+
+        MOV actLen,CX
+        RET
+ENDP
+END START
